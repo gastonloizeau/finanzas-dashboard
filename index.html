@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Finanzas</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #111; color: #fff; font-family: -apple-system, sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; }
+    .header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 24px; }
+    .header h1 { font-size: 22px; font-weight: 500; }
+    .mep { font-size: 13px; color: #888; text-align: right; }
+    .mep span { display: block; font-size: 15px; font-weight: 500; color: #fff; }
+    .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+    .card { background: #1e1e1e; border-radius: 12px; padding: 16px; }
+    .card label { font-size: 12px; color: #888; display: block; margin-bottom: 6px; }
+    .card .val { font-size: 20px; font-weight: 500; }
+    .card.red { background: #2a1515; }
+    .card.red .val { color: #E24B4A; }
+    .chart-wrap { background: #1e1e1e; border-radius: 12px; padding: 20px; margin-bottom: 24px; }
+    .chart-wrap h2 { font-size: 14px; font-weight: 500; margin-bottom: 16px; color: #ccc; }
+    .bottom { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .panel { background: #1e1e1e; border-radius: 12px; padding: 16px; }
+    .panel label { font-size: 12px; color: #888; display: block; margin-bottom: 10px; }
+    .panel .big { font-size: 18px; font-weight: 500; margin-bottom: 4px; }
+    .panel .sub { font-size: 11px; color: #555; }
+    .deudas { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
+    .deuda-row { display: flex; justify-content: space-between; font-size: 13px; }
+    .deuda-row span:first-child { color: #888; }
+    .updated { text-align: center; font-size: 11px; color: #333; margin-top: 20px; }
+    @media (max-width: 600px) {
+      .cards { grid-template-columns: repeat(2, 1fr); }
+      .bottom { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div>
+      <p style="font-size:13px;color:#888;margin-bottom:4px;" id="mes">Mayo 2026</p>
+      <h1>Resumen del mes</h1>
+    </div>
+    <div class="mep">
+      Dólar MEP
+      <span id="mep">—</span>
+    </div>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <label>Ingresos</label>
+      <div class="val" id="ingresos">—</div>
+    </div>
+    <div class="card">
+      <label>Gastos</label>
+      <div class="val" id="gastos">—</div>
+    </div>
+    <div class="card">
+      <label>Música</label>
+      <div class="val" id="musica">—</div>
+    </div>
+    <div class="card red">
+      <label>Total del mes</label>
+      <div class="val" id="total">—</div>
+    </div>
+  </div>
+
+  <div class="chart-wrap">
+    <h2>Categorías</h2>
+    <canvas id="chart" height="300"></canvas>
+  </div>
+
+  <div class="bottom">
+    <div class="panel">
+      <label>💰 Patrimonio</label>
+      <div class="big" id="patrimonio">—</div>
+      <div class="sub" id="patrimonio-sub">—</div>
+    </div>
+    <div class="panel">
+      <label>🧾 Gastos Fijos</label>
+      <div class="big" id="fijos">—</div>
+    </div>
+    <div class="panel">
+      <label>🤙 Me deben</label>
+      <div class="deudas" id="deudas">—</div>
+    </div>
+  </div>
+
+  <div class="updated" id="updated">—</div>
+
+  <script>
+    const GIST = "https://gist.githubusercontent.com/gastonloizeau/038451cb02ce1b4a2c492f112e352ef6/raw/finanzas.json"
+    const fmt = (n) => {
+      const abs = Math.abs(n)
+      const sign = n < 0 ? '-' : ''
+      if (abs >= 1000000) return sign + '$' + (abs/1000000).toFixed(1) + 'M'
+      if (abs >= 1000) return sign + '$' + Math.round(abs/1000) + 'k'
+      return sign + '$' + abs
+    }
+
+    fetch(GIST + '?t=' + Date.now())
+      .then(r => r.json())
+      .then(d => {
+        document.getElementById('mep').textContent = '$' + d.dolar_mep.toLocaleString('es-AR')
+        document.getElementById('ingresos').textContent = fmt(d.ingresos)
+        document.getElementById('gastos').textContent = fmt(d.gastos)
+        document.getElementById('musica').textContent = fmt(d.musica)
+        const totalEl = document.getElementById('total')
+        totalEl.textContent = fmt(d.total_mes)
+        totalEl.style.color = d.total_mes < 0 ? '#E24B4A' : '#1D9E75'
+        document.getElementById('patrimonio').textContent = 'USD ' + d.patrimonio_usd.toLocaleString()
+        document.getElementById('patrimonio-sub').textContent = 'Cuentas ' + d.cuentas_usd.toLocaleString() + ' · Me deben ' + d.me_deben.reduce((a,b) => a + b.usd, 0)
+        document.getElementById('fijos').textContent = '$284.431'
+        const deudas = document.getElementById('deudas')
+        deudas.innerHTML = d.me_deben.map(m => `<div class="deuda-row"><span>${m.nombre}</span><span>USD ${m.usd}</span></div>`).join('')
+        document.getElementById('updated').textContent = 'Actualizado ' + d.fecha
+
+        const cats = d.categorias
+        const labels = cats.map(c => c.nombre)
+        const ings = cats.map(c => c.ing)
+        const gas = cats.map(c => c.gas)
+        new Chart(document.getElementById('chart'), {
+          type: 'bar',
+          data: {
+            labels,
+            datasets: [
+              { label: 'Ingresos', data: ings, backgroundColor: '#1D9E75', borderRadius: 4 },
+              { label: 'Gastos', data: gas, backgroundColor: '#E24B4A', borderRadius: 4 }
+            ]
+          },
+          options: {
+            indexAxis: 'y',
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: {
+              x: { ticks: { callback: fmt, color: '#666', font: { size: 11 } }, grid: { color: '#222' } },
+              y: { ticks: { color: '#aaa', font: { size: 11 } }, grid: { display: false } }
+            }
+          }
+        })
+      })
+  </script>
+</body>
+</html>
