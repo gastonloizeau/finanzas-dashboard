@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -14,7 +15,6 @@
     td { padding: 8px; border-bottom: 1px solid #1a1a1a; }
     tr:last-child td { border-bottom: none; }
     @media (max-width: 600px) {
-      .top-cards { grid-template-columns: 1fr 1fr !important; }
       .eq-row { grid-template-columns: 1fr 1fr !important; }
       .eq-row .eq-sign { display: none; }
       .bottom-panels { grid-template-columns: 1fr !important; }
@@ -25,7 +25,7 @@
 
 <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1.5rem; flex-wrap:wrap; gap:12px;">
   <div>
-    <p style="font-size:13px; color:#888; margin:0;" id="mes-label">Mayo 2026</p>
+    <p style="font-size:13px; color:#888; margin:0;">Mayo 2026</p>
     <p style="font-size:22px; font-weight:500; margin:4px 0 0;">Resumen del mes</p>
   </div>
   <div style="display:flex; gap:8px; flex-wrap:wrap;">
@@ -135,31 +135,29 @@ fetch(GIST + '?t=' + Date.now())
   .then(r => r.json())
   .then(d => {
     const mep = d.dolar_mep || 1430.80
-
     document.getElementById('mep').textContent = '$' + mep.toLocaleString('es-AR')
     document.getElementById('sp500').textContent = '$' + (d.sp500 || '7.379')
     document.getElementById('btc').textContent = '$' + (d.btc || '76.794')
-
     document.getElementById('ingresos').textContent = fmt(d.ingresos)
     document.getElementById('gastos').textContent = fmt(d.gastos)
 
     const musica = d.musica || 0
-    const musicaCard = document.getElementById('musica-card')
-    const musicaLabel = document.getElementById('musica-label')
-    const musicaVal = document.getElementById('musica')
-    musicaCard.style.background = musica >= 0 ? '#0e2018' : '#2a1515'
-    musicaLabel.style.color = musica >= 0 ? '#1D9E75' : '#E24B4A'
-    musicaVal.style.color = musica >= 0 ? '#1D9E75' : '#E24B4A'
-    musicaVal.textContent = fmt(musica)
+    const mc = document.getElementById('musica-card')
+    const ml = document.getElementById('musica-label')
+    const mv = document.getElementById('musica')
+    mc.style.background = musica >= 0 ? '#0e2018' : '#2a1515'
+    ml.style.color = musica >= 0 ? '#1D9E75' : '#E24B4A'
+    mv.style.color = musica >= 0 ? '#1D9E75' : '#E24B4A'
+    mv.textContent = fmt(musica)
 
     const total = d.total_mes || 0
-    const totalCard = document.getElementById('total-card')
-    const totalLabel = document.getElementById('total-label')
-    const totalVal = document.getElementById('total')
-    totalCard.style.background = total >= 0 ? '#0e2018' : '#2a1515'
-    totalLabel.style.color = total >= 0 ? '#1D9E75' : '#E24B4A'
-    totalVal.style.color = total >= 0 ? '#1D9E75' : '#E24B4A'
-    totalVal.textContent = fmt(total)
+    const tc = document.getElementById('total-card')
+    const tl = document.getElementById('total-label')
+    const tv = document.getElementById('total')
+    tc.style.background = total >= 0 ? '#0e2018' : '#2a1515'
+    tl.style.color = total >= 0 ? '#1D9E75' : '#E24B4A'
+    tv.style.color = total >= 0 ? '#1D9E75' : '#E24B4A'
+    tv.textContent = fmt(total)
 
     const meDebenUSD = d.me_deben.reduce((a,b) => a + b.usd, 0)
     document.getElementById('patrimonio').textContent = 'USD ' + (d.cuentas_usd + meDebenUSD).toLocaleString()
@@ -170,8 +168,7 @@ fetch(GIST + '?t=' + Date.now())
     document.getElementById('fijos').textContent = fmt(fijosARS)
 
     document.getElementById('deudas-total').textContent = 'USD ' + meDebenUSD
-    const rows = document.getElementById('deudas-rows')
-    rows.innerHTML = d.me_deben.map((m, i, arr) => `
+    document.getElementById('deudas-rows').innerHTML = d.me_deben.map((m, i, arr) => `
       <div style="display:flex; justify-content:space-between; align-items:center;">
         <span style="font-size:12px; color:#555;">${m.nombre} me debe</span>
         <span style="font-size:13px; font-weight:500; color:#1D9E75;">USD ${m.usd}</span>
