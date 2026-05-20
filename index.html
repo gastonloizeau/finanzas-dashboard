@@ -1,102 +1,216 @@
-const fm = FileManager.iCloud()
-const path = fm.joinPath(fm.documentsDirectory(), "Finanzas/dashboard.json")
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Finanzas</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #111; color: #fff; font-family: -apple-system, sans-serif; padding: 20px; max-width: 860px; margin: 0 auto; }
+    .updated { text-align: center; font-size: 11px; color: #333; margin-top: 20px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { text-align: left; color: #555; font-weight: 400; padding: 6px 8px; border-bottom: 1px solid #2a2a2a; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+    td { padding: 8px; border-bottom: 1px solid #1a1a1a; }
+    tr:last-child td { border-bottom: none; }
+    @media (max-width: 600px) {
+      .top-cards { grid-template-columns: 1fr 1fr !important; }
+      .eq-row { grid-template-columns: 1fr 1fr !important; }
+      .eq-row .eq-sign { display: none; }
+      .bottom-panels { grid-template-columns: 1fr !important; }
+    }
+  </style>
+</head>
+<body>
 
-await fm.downloadFileFromiCloud(path)
+<div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1.5rem; flex-wrap:wrap; gap:12px;">
+  <div>
+    <p style="font-size:13px; color:#888; margin:0;" id="mes-label">Mayo 2026</p>
+    <p style="font-size:22px; font-weight:500; margin:4px 0 0;">Resumen del mes</p>
+  </div>
+  <div style="display:flex; gap:8px; flex-wrap:wrap;">
+    <div style="background:#1e1e1e; border-radius:8px; padding:8px 14px; text-align:center;">
+      <p style="font-size:10px; color:#666; margin:0; text-transform:uppercase; letter-spacing:0.5px;">Dólar MEP</p>
+      <p style="font-size:14px; font-weight:500; margin:2px 0 0;" id="mep">—</p>
+    </div>
+    <div style="background:#1e1e1e; border-radius:8px; padding:8px 14px; text-align:center;">
+      <p style="font-size:10px; color:#666; margin:0; text-transform:uppercase; letter-spacing:0.5px;">S&P 500</p>
+      <p style="font-size:14px; font-weight:500; margin:2px 0 0; color:#1D9E75;" id="sp500">—</p>
+    </div>
+    <div style="background:#1e1e1e; border-radius:8px; padding:8px 14px; text-align:center;">
+      <p style="font-size:10px; color:#666; margin:0; text-transform:uppercase; letter-spacing:0.5px;">Bitcoin</p>
+      <p style="font-size:14px; font-weight:500; margin:2px 0 0; color:#F7931A;" id="btc">—</p>
+    </div>
+  </div>
+</div>
 
-const raw = fm.readString(path)
-const d = JSON.parse(raw)
+<div class="eq-row" style="display:grid; grid-template-columns:1fr 1fr 1fr auto 1fr; gap:0; align-items:center; margin-bottom:1.5rem;">
+  <div style="background:#0e2018; border-radius:12px; padding:16px; margin-right:8px;">
+    <p style="font-size:12px; color:#1D9E75; margin:0 0 6px;">Ingresos</p>
+    <p style="font-size:20px; font-weight:500; margin:0; color:#1D9E75;" id="ingresos">—</p>
+  </div>
+  <div style="background:#2a1515; border-radius:12px; padding:16px; margin-right:8px;">
+    <p style="font-size:12px; color:#E24B4A; margin:0 0 6px;">Gastos</p>
+    <p style="font-size:20px; font-weight:500; margin:0; color:#E24B4A;" id="gastos">—</p>
+  </div>
+  <div id="musica-card" style="border-radius:12px; padding:16px; margin-right:8px;">
+    <p style="font-size:12px; margin:0 0 6px;" id="musica-label">Música</p>
+    <p style="font-size:20px; font-weight:500; margin:0;" id="musica">—</p>
+  </div>
+  <div class="eq-sign" style="font-size:22px; color:#444; padding:0 12px; font-weight:300;">=</div>
+  <div id="total-card" style="border-radius:12px; padding:16px;">
+    <p style="font-size:12px; margin:0 0 6px;" id="total-label">Total del mes</p>
+    <p style="font-size:20px; font-weight:500; margin:0;" id="total">—</p>
+  </div>
+</div>
 
-const fmt = (n) => {
-  const abs = Math.abs(n)
-  const sign = n < 0 ? '-' : ''
+<div style="background:#1a1a1a; border-radius:14px; padding:20px; margin-bottom:1.5rem; border:0.5px solid #2a2a2a;">
+  <div style="position:relative; height:320px;">
+    <canvas id="chart"></canvas>
+  </div>
+</div>
+
+<div class="bottom-panels" style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:1.5rem;">
+  <div style="background:#1a1a1a; border-radius:14px; padding:1.25rem; border:0.5px solid #2a2a2a;">
+    <p style="font-size:11px; color:#555; margin:0 0 4px; text-transform:uppercase; letter-spacing:0.6px;">Patrimonio</p>
+    <p style="font-size:22px; font-weight:500; margin:0 0 14px;" id="patrimonio">—</p>
+    <div style="display:flex; flex-direction:column; gap:8px;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-size:12px; color:#555;">Cuentas</span>
+        <span style="font-size:13px; font-weight:500;" id="pat-cuentas">—</span>
+      </div>
+      <div style="height:0.5px; background:#2a2a2a;"></div>
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-size:12px; color:#555;">Me deben</span>
+        <span style="font-size:13px; font-weight:500; color:#1D9E75;" id="pat-deben">—</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="background:#1a1a1a; border-radius:14px; padding:1.25rem; border:0.5px solid #2a2a2a; display:flex; flex-direction:column; justify-content:center;">
+    <p style="font-size:11px; color:#555; margin:0 0 4px; text-transform:uppercase; letter-spacing:0.6px;">Gastos Fijos</p>
+    <p style="font-size:22px; font-weight:500; margin:0;" id="fijos">—</p>
+    <p style="font-size:11px; color:#444; margin:6px 0 0;">por mes</p>
+  </div>
+
+  <div style="background:#1a1a1a; border-radius:14px; padding:1.25rem; border:0.5px solid #2a2a2a;">
+    <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:14px;">
+      <p style="font-size:11px; color:#555; margin:0; text-transform:uppercase; letter-spacing:0.6px;">Deudas</p>
+      <p style="font-size:15px; font-weight:500; margin:0; color:#1D9E75;" id="deudas-total">—</p>
+    </div>
+    <div id="deudas-rows" style="display:flex; flex-direction:column; gap:8px;"></div>
+  </div>
+</div>
+
+<div style="background:#1a1a1a; border-radius:14px; padding:1.25rem; border:0.5px solid #2a2a2a;">
+  <p style="font-size:13px; font-weight:500; margin:0 0 12px; color:#ccc;">Últimos movimientos</p>
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Categoría</th>
+        <th>Detalle</th>
+        <th style="text-align:right; color:#1D9E75;">Ingreso</th>
+        <th style="text-align:right; color:#E24B4A;">Gasto</th>
+      </tr>
+    </thead>
+    <tbody id="movTable"></tbody>
+  </table>
+</div>
+
+<div class="updated" id="updated">—</div>
+
+<script>
+const GIST = "https://gist.githubusercontent.com/gastonloizeau/038451cb02ce1b4a2c492f112e352ef6/raw/finanzas.json"
+const fmt = (v) => {
+  if (v === 0 || v === null || v === undefined) return '$0'
+  const abs = Math.abs(v)
+  const sign = v < 0 ? '-' : ''
   if (abs >= 1000000) return sign + '$' + (abs/1000000).toFixed(1) + 'M'
   if (abs >= 1000) return sign + '$' + Math.round(abs/1000) + 'k'
   return sign + '$' + abs
 }
 
-const w = new ListWidget()
-w.backgroundColor = new Color("#1a1a1a")
-w.setPadding(12, 14, 12, 14)
+fetch(GIST + '?t=' + Date.now())
+  .then(r => r.json())
+  .then(d => {
+    const mep = d.dolar_mep || 1430.80
 
-// Header
-const header = w.addStack()
-header.layoutHorizontally()
-const title = header.addText("Mayo 2026")
-title.font = Font.mediumSystemFont(11)
-title.textColor = new Color("#888888")
-header.addSpacer()
-const dolar = header.addText("MEP $" + d.dolar_mep.toLocaleString('es-AR'))
-dolar.font = Font.systemFont(10)
-dolar.textColor = new Color("#888888")
+    document.getElementById('mep').textContent = '$' + mep.toLocaleString('es-AR')
+    document.getElementById('sp500').textContent = '$' + (d.sp500 || '7.379')
+    document.getElementById('btc').textContent = '$' + (d.btc || '76.794')
 
-w.addSpacer(6)
+    document.getElementById('ingresos').textContent = fmt(d.ingresos)
+    document.getElementById('gastos').textContent = fmt(d.gastos)
 
-// Total del mes
-const totalText = w.addText(fmt(d.total_mes))
-totalText.font = Font.boldSystemFont(26)
-totalText.textColor = d.total_mes < 0 ? new Color("#E24B4A") : new Color("#1D9E75")
+    const musica = d.musica || 0
+    const musicaCard = document.getElementById('musica-card')
+    const musicaLabel = document.getElementById('musica-label')
+    const musicaVal = document.getElementById('musica')
+    musicaCard.style.background = musica >= 0 ? '#0e2018' : '#2a1515'
+    musicaLabel.style.color = musica >= 0 ? '#1D9E75' : '#E24B4A'
+    musicaVal.style.color = musica >= 0 ? '#1D9E75' : '#E24B4A'
+    musicaVal.textContent = fmt(musica)
 
-const totalLabel = w.addText("Total del mes")
-totalLabel.font = Font.systemFont(10)
-totalLabel.textColor = new Color("#666666")
+    const total = d.total_mes || 0
+    const totalCard = document.getElementById('total-card')
+    const totalLabel = document.getElementById('total-label')
+    const totalVal = document.getElementById('total')
+    totalCard.style.background = total >= 0 ? '#0e2018' : '#2a1515'
+    totalLabel.style.color = total >= 0 ? '#1D9E75' : '#E24B4A'
+    totalVal.style.color = total >= 0 ? '#1D9E75' : '#E24B4A'
+    totalVal.textContent = fmt(total)
 
-w.addSpacer(8)
+    const meDebenUSD = d.me_deben.reduce((a,b) => a + b.usd, 0)
+    document.getElementById('patrimonio').textContent = 'USD ' + (d.cuentas_usd + meDebenUSD).toLocaleString()
+    document.getElementById('pat-cuentas').textContent = 'USD ' + d.cuentas_usd.toLocaleString()
+    document.getElementById('pat-deben').textContent = 'USD ' + meDebenUSD.toLocaleString()
 
-// Fila ingresos / gastos
-const row1 = w.addStack()
-row1.layoutHorizontally()
+    const fijosARS = 50400 + 64000 + 92768 + 60000 + Math.round(54 * mep)
+    document.getElementById('fijos').textContent = fmt(fijosARS)
 
-const ingStack = row1.addStack()
-ingStack.layoutVertically()
-const ingVal = ingStack.addText(fmt(d.ingresos))
-ingVal.font = Font.mediumSystemFont(13)
-ingVal.textColor = new Color("#1D9E75")
-const ingLabel = ingStack.addText("Ingresos")
-ingLabel.font = Font.systemFont(9)
-ingLabel.textColor = new Color("#666666")
+    document.getElementById('deudas-total').textContent = 'USD ' + meDebenUSD
+    const rows = document.getElementById('deudas-rows')
+    rows.innerHTML = d.me_deben.map((m, i, arr) => `
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-size:12px; color:#555;">${m.nombre} me debe</span>
+        <span style="font-size:13px; font-weight:500; color:#1D9E75;">USD ${m.usd}</span>
+      </div>
+      ${i < arr.length - 1 ? '<div style="height:0.5px; background:#2a2a2a;"></div>' : ''}
+    `).join('')
 
-row1.addSpacer()
+    document.getElementById('updated').textContent = 'Actualizado ' + d.fecha
 
-const gasStack = row1.addStack()
-gasStack.layoutVertically()
-const gasVal = gasStack.addText(fmt(d.gastos))
-gasVal.font = Font.mediumSystemFont(13)
-gasVal.textColor = new Color("#E24B4A")
-const gasLabel = gasStack.addText("Gastos")
-gasLabel.font = Font.systemFont(9)
-gasLabel.textColor = new Color("#666666")
+    new Chart(document.getElementById('chart'), {
+      type: 'bar',
+      data: {
+        labels: d.categorias.map(c => c.nombre),
+        datasets: [
+          { label: 'Ingresos', data: d.categorias.map(c => c.ing), backgroundColor: '#1D9E75', borderRadius: 4 },
+          { label: 'Gastos', data: d.categorias.map(c => c.gas), backgroundColor: '#E24B4A', borderRadius: 4 }
+        ]
+      },
+      options: {
+        indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { ticks: { callback: fmt, color: '#666', font: { size: 11 } }, grid: { color: '#1a1a1a' } },
+          y: { ticks: { color: '#aaa', font: { size: 11 } }, grid: { display: false } }
+        }
+      }
+    })
 
-row1.addSpacer()
-
-const musStack = row1.addStack()
-musStack.layoutVertically()
-const musVal = musStack.addText(fmt(d.musica_neta))
-musVal.font = Font.mediumSystemFont(13)
-musVal.textColor = new Color("#7F77DD")
-const musLabel = musStack.addText("Música")
-musLabel.font = Font.systemFont(9)
-musLabel.textColor = new Color("#666666")
-
-w.addSpacer(8)
-
-// Patrimonio
-const patRow = w.addStack()
-patRow.layoutHorizontally()
-const patVal = patRow.addText("USD " + d.patrimonio_usd.toLocaleString('es-AR'))
-patVal.font = Font.mediumSystemFont(12)
-patVal.textColor = new Color("#ffffff")
-patRow.addSpacer()
-const patLabel = patRow.addText("Patrimonio")
-patLabel.font = Font.systemFont(10)
-patLabel.textColor = new Color("#666666")
-
-w.addSpacer(4)
-
-// Fecha
-const fecha = w.addText("Actualizado " + d.fecha)
-fecha.font = Font.systemFont(9)
-fecha.textColor = new Color("#444444")
-
-Script.setWidget(w)
-Script.complete()
-w.presentMedium()
+    const movs = d.movimientos || []
+    document.getElementById('movTable').innerHTML = movs.map((m,i) => `
+      <tr>
+        <td style="color:#444;">${i+1}</td>
+        <td>${m.cat}</td>
+        <td style="color:#666;">${m.det || '—'}</td>
+        <td style="text-align:right; color:#1D9E75;">${m.ing > 0 ? fmt(m.ing) : '—'}</td>
+        <td style="text-align:right; color:#E24B4A;">${m.gas > 0 ? fmt(m.gas) : '—'}</td>
+      </tr>
+    `).join('')
+  })
+</script>
+</body>
+</html>
