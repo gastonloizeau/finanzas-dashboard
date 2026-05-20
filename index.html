@@ -14,9 +14,20 @@
     th { text-align: left; color: #555; font-weight: 400; padding: 6px 8px; border-bottom: 1px solid #2a2a2a; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
     td { padding: 8px; border-bottom: 1px solid #1a1a1a; }
     tr:last-child td { border-bottom: none; }
+    .card-clickable { cursor: pointer; transition: background 0.15s; }
+    .card-clickable:hover { filter: brightness(1.2); }
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100; align-items: center; justify-content: center; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: #1a1a1a; border-radius: 16px; padding: 24px; min-width: 300px; max-width: 440px; width: 90%; border: 0.5px solid #2a2a2a; }
+    .modal h3 { font-size: 15px; font-weight: 500; margin-bottom: 16px; color: #ccc; }
+    .modal-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 0.5px solid #222; font-size: 13px; }
+    .modal-row:last-child { border-bottom: none; }
+    .modal-row span:first-child { color: #666; }
+    .modal-total { display: flex; justify-content: space-between; padding: 12px 0 0; font-size: 15px; font-weight: 500; border-top: 0.5px solid #333; margin-top: 4px; }
+    .close-btn { float: right; background: #2a2a2a; border: none; color: #888; border-radius: 6px; padding: 4px 10px; cursor: pointer; font-size: 12px; margin-bottom: 4px; }
     @media (max-width: 600px) {
       .eq-row { grid-template-columns: 1fr 1fr !important; }
-      .eq-row .eq-sign { display: none; }
+      .eq-sign { display: none; }
       .bottom-panels { grid-template-columns: 1fr !important; }
     }
   </style>
@@ -71,35 +82,37 @@
 </div>
 
 <div class="bottom-panels" style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:1.5rem;">
-  <div style="background:#1a1a1a; border-radius:14px; padding:1.25rem; border:0.5px solid #2a2a2a;">
+
+  <div class="card-clickable" onclick="openModal('patrimonio')" style="background:#1a1a1a; border-radius:14px; padding:1.25rem; border:0.5px solid #2a2a2a;">
     <p style="font-size:11px; color:#555; margin:0 0 4px; text-transform:uppercase; letter-spacing:0.6px;">Patrimonio</p>
     <p style="font-size:22px; font-weight:500; margin:0 0 14px;" id="patrimonio">—</p>
     <div style="display:flex; flex-direction:column; gap:8px;">
-      <div style="display:flex; justify-content:space-between; align-items:center;">
+      <div style="display:flex; justify-content:space-between;">
         <span style="font-size:12px; color:#555;">Cuentas</span>
         <span style="font-size:13px; font-weight:500;" id="pat-cuentas">—</span>
       </div>
       <div style="height:0.5px; background:#2a2a2a;"></div>
-      <div style="display:flex; justify-content:space-between; align-items:center;">
+      <div style="display:flex; justify-content:space-between;">
         <span style="font-size:12px; color:#555;">Me deben</span>
         <span style="font-size:13px; font-weight:500; color:#1D9E75;" id="pat-deben">—</span>
       </div>
     </div>
   </div>
 
-  <div style="background:#1a1a1a; border-radius:14px; padding:1.25rem; border:0.5px solid #2a2a2a; display:flex; flex-direction:column; justify-content:center;">
+  <div class="card-clickable" onclick="openModal('fijos')" style="background:#1a1a1a; border-radius:14px; padding:1.25rem; border:0.5px solid #2a2a2a; display:flex; flex-direction:column; justify-content:center;">
     <p style="font-size:11px; color:#555; margin:0 0 4px; text-transform:uppercase; letter-spacing:0.6px;">Gastos Fijos</p>
     <p style="font-size:22px; font-weight:500; margin:0;" id="fijos">—</p>
     <p style="font-size:11px; color:#444; margin:6px 0 0;">por mes</p>
   </div>
 
-  <div style="background:#1a1a1a; border-radius:14px; padding:1.25rem; border:0.5px solid #2a2a2a;">
+  <div class="card-clickable" onclick="openModal('deudas')" style="background:#1a1a1a; border-radius:14px; padding:1.25rem; border:0.5px solid #2a2a2a;">
     <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:14px;">
       <p style="font-size:11px; color:#555; margin:0; text-transform:uppercase; letter-spacing:0.6px;">Deudas</p>
       <p style="font-size:15px; font-weight:500; margin:0; color:#1D9E75;" id="deudas-total">—</p>
     </div>
     <div id="deudas-rows" style="display:flex; flex-direction:column; gap:8px;"></div>
   </div>
+
 </div>
 
 <div style="background:#1a1a1a; border-radius:14px; padding:1.25rem; border:0.5px solid #2a2a2a;">
@@ -107,9 +120,7 @@
   <table>
     <thead>
       <tr>
-        <th>#</th>
-        <th>Categoría</th>
-        <th>Detalle</th>
+        <th>#</th><th>Categoría</th><th>Detalle</th>
         <th style="text-align:right; color:#1D9E75;">Ingreso</th>
         <th style="text-align:right; color:#E24B4A;">Gasto</th>
       </tr>
@@ -120,16 +131,62 @@
 
 <div class="updated" id="updated">—</div>
 
+<!-- Modal Patrimonio -->
+<div class="modal-overlay" id="modal-patrimonio" onclick="closeOnBg(event,'patrimonio')">
+  <div class="modal">
+    <button class="close-btn" onclick="closeModal('patrimonio')">✕ cerrar</button>
+    <h3>Patrimonio</h3>
+    <div class="modal-row"><span>CHASE</span><span>USD 89</span></div>
+    <div class="modal-row"><span>Binance</span><span>USD 3.000</span></div>
+    <div class="modal-row"><span>Payoneer</span><span>USD 16</span></div>
+    <div class="modal-row"><span>IEB</span><span>USD 3.437</span></div>
+    <div class="modal-row" style="font-weight:500;"><span style="color:#fff;">Total cuentas</span><span id="m-cuentas">—</span></div>
+    <div class="modal-row"><span>Me deben</span><span id="m-medeben" style="color:#1D9E75;">—</span></div>
+    <div class="modal-total"><span>Total patrimonio</span><span id="m-patrimonio" style="color:#1D9E75;">—</span></div>
+  </div>
+</div>
+
+<!-- Modal Gastos Fijos -->
+<div class="modal-overlay" id="modal-fijos" onclick="closeOnBg(event,'fijos')">
+  <div class="modal">
+    <button class="close-btn" onclick="closeModal('fijos')">✕ cerrar</button>
+    <h3>Gastos Fijos</h3>
+    <div class="modal-row"><span>Seguro</span><span>$50.400</span></div>
+    <div class="modal-row"><span>Monotributo</span><span>$64.000</span></div>
+    <div class="modal-row"><span>Obra Social</span><span>$92.768</span></div>
+    <div class="modal-row"><span>Expensas</span><span>$60.000</span></div>
+    <div class="modal-row" style="font-weight:500;"><span style="color:#fff;">Plataformas</span><span id="m-plat-total">—</span></div>
+    <div class="modal-row" style="padding-left:12px;"><span style="color:#444;">SUNO</span><span>$10 USD</span></div>
+    <div class="modal-row" style="padding-left:12px;"><span style="color:#444;">Instagram</span><span>$7 USD</span></div>
+    <div class="modal-row" style="padding-left:12px;"><span style="color:#444;">Google Drive</span><span>$10 USD</span></div>
+    <div class="modal-row" style="padding-left:12px;"><span style="color:#444;">Claude</span><span>$20 USD</span></div>
+    <div class="modal-row" style="padding-left:12px;"><span style="color:#444;">iCloud</span><span>$3 USD</span></div>
+    <div class="modal-row" style="padding-left:12px;"><span style="color:#444;">Spotify</span><span>$4 USD</span></div>
+    <div class="modal-total"><span>Total mensual</span><span id="m-fijos-total" style="color:#E24B4A;">—</span></div>
+  </div>
+</div>
+
+<!-- Modal Deudas -->
+<div class="modal-overlay" id="modal-deudas" onclick="closeOnBg(event,'deudas')">
+  <div class="modal">
+    <button class="close-btn" onclick="closeModal('deudas')">✕ cerrar</button>
+    <h3>Deudas</h3>
+    <div id="modal-deudas-rows"></div>
+    <div class="modal-total"><span>Total</span><span id="m-deudas-total" style="color:#1D9E75;">—</span></div>
+  </div>
+</div>
+
 <script>
 const GIST = "https://gist.githubusercontent.com/gastonloizeau/038451cb02ce1b4a2c492f112e352ef6/raw/finanzas.json"
 const fmt = (v) => {
-  if (v === 0 || v === null || v === undefined) return '$0'
+  if (!v && v !== 0) return '$0'
   const abs = Math.abs(v)
   const sign = v < 0 ? '-' : ''
   if (abs >= 1000000) return sign + '$' + (abs/1000000).toFixed(1) + 'M'
   if (abs >= 1000) return sign + '$' + Math.round(abs/1000) + 'k'
   return sign + '$' + abs
 }
+const fmtARS = (n) => '$' + Math.round(n).toLocaleString('es-AR')
 
 fetch(GIST + '?t=' + Date.now())
   .then(r => r.json())
@@ -160,7 +217,8 @@ fetch(GIST + '?t=' + Date.now())
     tv.textContent = fmt(total)
 
     const meDebenUSD = d.me_deben.reduce((a,b) => a + b.usd, 0)
-    document.getElementById('patrimonio').textContent = 'USD ' + (d.cuentas_usd + meDebenUSD).toLocaleString()
+    const patrimonioUSD = d.cuentas_usd + meDebenUSD
+    document.getElementById('patrimonio').textContent = 'USD ' + patrimonioUSD.toLocaleString()
     document.getElementById('pat-cuentas').textContent = 'USD ' + d.cuentas_usd.toLocaleString()
     document.getElementById('pat-deben').textContent = 'USD ' + meDebenUSD.toLocaleString()
 
@@ -173,10 +231,24 @@ fetch(GIST + '?t=' + Date.now())
         <span style="font-size:12px; color:#555;">${m.nombre} me debe</span>
         <span style="font-size:13px; font-weight:500; color:#1D9E75;">USD ${m.usd}</span>
       </div>
-      ${i < arr.length - 1 ? '<div style="height:0.5px; background:#2a2a2a;"></div>' : ''}
+      ${i < arr.length - 1 ? '<div style="height:0.5px; background:#2a2a2a; margin:8px 0;"></div>' : ''}
     `).join('')
 
     document.getElementById('updated').textContent = 'Actualizado ' + d.fecha
+
+    // Modales
+    document.getElementById('m-cuentas').textContent = 'USD ' + d.cuentas_usd.toLocaleString()
+    document.getElementById('m-medeben').textContent = 'USD ' + meDebenUSD
+    document.getElementById('m-patrimonio').textContent = 'USD ' + patrimonioUSD.toLocaleString()
+    document.getElementById('m-plat-total').textContent = fmtARS(54 * mep)
+    document.getElementById('m-fijos-total').textContent = fmtARS(fijosARS)
+    document.getElementById('modal-deudas-rows').innerHTML = d.me_deben.map((m, i, arr) => `
+      <div class="modal-row">
+        <span>${m.nombre} me debe</span>
+        <span style="color:#1D9E75;">USD ${m.usd}</span>
+      </div>
+    `).join('')
+    document.getElementById('m-deudas-total').textContent = 'USD ' + meDebenUSD
 
     new Chart(document.getElementById('chart'), {
       type: 'bar',
@@ -208,6 +280,10 @@ fetch(GIST + '?t=' + Date.now())
       </tr>
     `).join('')
   })
+
+function openModal(id) { document.getElementById('modal-' + id).classList.add('open') }
+function closeModal(id) { document.getElementById('modal-' + id).classList.remove('open') }
+function closeOnBg(e, id) { if (e.target === document.getElementById('modal-' + id)) closeModal(id) }
 </script>
 </body>
 </html>
