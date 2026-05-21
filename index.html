@@ -26,20 +26,29 @@
     .modal-total { display: flex; justify-content: space-between; padding: 12px 0 0; font-size: 15px; font-weight: 500; border-top: 0.5px solid #333; margin-top: 4px; }
     .close-btn { float: right; background: #2a2a2a; border: none; color: #888; border-radius: 6px; padding: 4px 10px; cursor: pointer; font-size: 12px; margin-bottom: 4px; }
     @media (max-width: 600px) {
-      .eq-row { grid-template-columns: 1fr 1fr !important; }
-      .eq-sign { display: none; }
+      body { padding: 14px; }
+      .eq-row { grid-template-columns: 1fr 1fr !important; gap: 8px !important; }
+      .eq-row > div { margin-right: 0 !important; }
+      .eq-sign { display: none !important; }
       .bottom-panels { grid-template-columns: 1fr !important; }
+      .market-pills { width: 100%; display: grid !important; grid-template-columns: 1fr 1fr 1fr; gap: 6px !important; }
+      .market-pills > div { padding: 8px 6px !important; }
+      .header-row { flex-direction: column; }
+      table { font-size: 11px; }
+      th, td { padding: 6px 4px !important; }
+      th { font-size: 9px !important; letter-spacing: 0.3px !important; }
+      .mov-num { display: none; }
     }
   </style>
 </head>
 <body>
 
-<div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1.5rem; flex-wrap:wrap; gap:12px;">
+<div class="header-row" style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1.5rem; flex-wrap:wrap; gap:12px;">
   <div>
     <p style="font-size:13px; color:#888; margin:0;">Mayo 2026</p>
     <p style="font-size:22px; font-weight:500; margin:4px 0 0;">Resumen del mes</p>
   </div>
-  <div style="display:flex; gap:8px; flex-wrap:wrap;">
+  <div class="market-pills" style="display:flex; gap:8px; flex-wrap:wrap;">
     <div style="background:#1e1e1e; border-radius:8px; padding:8px 14px; text-align:center;">
       <p style="font-size:10px; color:#666; margin:0; text-transform:uppercase; letter-spacing:0.5px;">Dólar MEP</p>
       <p style="font-size:14px; font-weight:500; margin:2px 0 0;" id="mep">—</p>
@@ -120,7 +129,7 @@
   <table>
     <thead>
       <tr>
-        <th>#</th><th>Categoría</th><th>Detalle</th>
+        <th class="mov-num">#</th><th>Categoría</th><th>Detalle</th>
         <th style="text-align:right; color:#1D9E75;">Ingreso</th>
         <th style="text-align:right; color:#E24B4A;">Gasto</th>
       </tr>
@@ -272,7 +281,7 @@ fetch(GIST + '?t=' + Date.now())
     const movs = d.movimientos || []
     document.getElementById('movTable').innerHTML = movs.map((m,i) => `
       <tr>
-        <td style="color:#444;">${i+1}</td>
+        <td class="mov-num" style="color:#444;">${i+1}</td>
         <td>${m.cat}</td>
         <td style="color:#666;">${m.det || '—'}</td>
         <td style="text-align:right; color:#1D9E75;">${m.ing > 0 ? fmt(m.ing) : '—'}</td>
