@@ -10,38 +10,26 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { background: #111; color: #fff; font-family: -apple-system, sans-serif; padding: 20px; max-width: 860px; margin: 0 auto; }
     .updated { text-align: center; font-size: 11px; color: #333; margin-top: 20px; }
-    table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    th { text-align: left; color: #555; font-weight: 400; padding: 6px 8px; border-bottom: 1px solid #2a2a2a; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
-    td { padding: 8px; border-bottom: 1px solid #1a1a1a; }
-    tr:last-child td { border-bottom: none; }
-    .pill { background: #1e1e1e; border-radius: 8px; padding: 8px 12px; text-align: center; }
-    .pill label { font-size: 10px; color: #666; display: block; margin-bottom: 2px; letter-spacing: 0.5px; text-transform: uppercase; cursor: default; }
-    .pill .pval { font-size: 13px; font-weight: 500; }
-    .pill .trend { font-size: 10px; margin-top: 1px; }
-    .pill.clickable { cursor: pointer; transition: filter 0.15s; }
-    .pill.clickable:hover { filter: brightness(1.3); border: 0.5px solid #333; }
     .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100; align-items: center; justify-content: center; }
     .modal-overlay.open { display: flex; }
     .modal { background: #1a1a1a; border-radius: 16px; padding: 24px; min-width: 280px; max-width: 420px; width: 90%; border: 0.5px solid #2a2a2a; }
     .modal h3 { font-size: 15px; font-weight: 500; margin-bottom: 16px; color: #ccc; }
     .modal-row { display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 0.5px solid #222; font-size: 13px; }
-    .modal-row:last-child { border-bottom: none; }
     .modal-row span:first-child { color: #666; }
     .modal-total { display: flex; justify-content: space-between; padding: 10px 0 0; font-size: 14px; font-weight: 500; border-top: 0.5px solid #333; margin-top: 4px; }
     .close-btn { float: right; background: #2a2a2a; border: none; color: #888; border-radius: 6px; padding: 4px 10px; cursor: pointer; font-size: 12px; margin-bottom: 4px; }
     .panel-sm { background: #1a1a1a; border-radius: 12px; padding: 1rem; border: 0.5px solid #2a2a2a; cursor: pointer; transition: filter 0.15s; }
     .panel-sm:hover { filter: brightness(1.2); }
-    .panel-sm p.plabel { font-size: 10px; color: #555; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.6px; }
-    .panel-sm p.pnum { font-size: 17px; font-weight: 500; margin: 0; }
-    .panel-sm p.psub { font-size: 11px; color: #444; margin: 4px 0 0; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { text-align: left; color: #555; font-weight: 400; padding: 6px 8px; border-bottom: 1px solid #2a2a2a; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+    td { padding: 8px; border-bottom: 1px solid #1a1a1a; }
+    tr:last-child td { border-bottom: none; }
     @media (max-width: 600px) {
       body { padding: 12px; }
-      .pills-wrap { display: grid !important; grid-template-columns: repeat(3,1fr) !important; }
       .eq-row { grid-template-columns: 1fr 1fr !important; }
       .eq-sign { display: none !important; }
       .panels-row { grid-template-columns: 1fr !important; }
-      table { font-size: 11px; }
-      th, td { padding: 5px 4px !important; }
+      .pills-wrap { display: grid !important; grid-template-columns: repeat(3,1fr) !important; }
     }
   </style>
 </head>
@@ -76,18 +64,21 @@
 </div>
 
 <div style="background:#1a1a1a; border-radius:14px; padding:20px; margin-bottom:1.5rem; border:0.5px solid #2a2a2a;">
-  <div style="position:relative; height:380px;"><canvas id="chart" role="img" aria-label="Categorías Mayo 2026"></canvas></div>
+  <div style="position:relative; height:400px;"><canvas id="chart" role="img" aria-label="Categorías Mayo 2026"></canvas></div>
 </div>
 
-<div class="panels-row" style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:1.5rem;" id="panels-row"></div>
+<div class="panels-row" style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:1.5rem;" id="panels"></div>
 
 <div style="background:#1a1a1a; border-radius:14px; padding:1.25rem; border:0.5px solid #2a2a2a;">
   <p style="font-size:13px; font-weight:500; margin:0 0 12px; color:#ccc;">Últimos movimientos</p>
-  <table><thead><tr>
-    <th>#</th><th>Categoría</th><th>Detalle</th>
-    <th style="text-align:right; color:#1D9E75;">Ingreso</th>
-    <th style="text-align:right; color:#E24B4A;">Gasto</th>
-  </tr></thead><tbody id="movTable"></tbody></table>
+  <table>
+    <thead><tr>
+      <th>Detalle</th>
+      <th>Categoría</th>
+      <th style="text-align:right;">Monto</th>
+    </tr></thead>
+    <tbody id="movTable"></tbody>
+  </table>
 </div>
 
 <div class="updated" id="updated">—</div>
@@ -106,7 +97,7 @@
     <div class="modal-row"><span>Obra Social</span><span>$92.768</span></div>
     <div class="modal-row"><span>Expensas</span><span>$60.000</span></div>
     <div class="modal-row"><span>Plataformas (54 USD)</span><span id="m-plat">—</span></div>
-    <div style="padding-left:12px; border-left:2px solid #222; margin:4px 0;">
+    <div style="padding-left:12px; border-left:2px solid #222; margin:2px 0 4px;">
       <div class="modal-row"><span style="color:#444;">SUNO</span><span>$10 USD</span></div>
       <div class="modal-row"><span style="color:#444;">Instagram</span><span>$7 USD</span></div>
       <div class="modal-row"><span style="color:#444;">Google Drive</span><span>$10 USD</span></div>
@@ -135,21 +126,19 @@ fetch(GIST+'?t='+Date.now()).then(r=>r.json()).then(d=>{
   const patrimonioUSD=d.cuentas_usd+meDebenUSD
   const fijosARS=50400+64000+92768+60000+Math.round(54*mep)
 
-  // Pills
+  // Pills — solo MEP, S&P, BTC
   const pillDefs=[
-    {label:'Dólar MEP',val:'$'+mep.toLocaleString('es-AR'),color:''},
-    {label:'S&P 500',val:'$'+(d.sp500||'7.492'),trend:d.sp500_trend||'',up:d.sp500_up!==false,color:'#1D9E75'},
-    {label:'Bitcoin',val:'$'+(d.btc||'76.793'),trend:d.btc_trend||'',up:d.btc_up!==false,color:'#F7931A'},
-    {label:'Patrimonio',val:'USD '+patrimonioUSD.toLocaleString(),color:'',modal:'patrimonio'},
-    {label:'Gastos Fijos',val:fmt(fijosARS),color:'',modal:'fijos'},
-    ...(meDebenUSD>0?[{label:'Deudas',val:'USD '+meDebenUSD,color:'#1D9E75',modal:'deudas'}]:[])
+    {label:'Dólar MEP', val:'$'+mep.toLocaleString('es-AR'), color:''},
+    {label:'S&P 500', val:'$'+(d.sp500||'—'), trend:d.sp500_trend||'', up:d.sp500_up!==false, color:'#1D9E75'},
+    {label:'Bitcoin', val:'$'+(d.btc||'—'), trend:d.btc_trend||'', up:d.btc_up, color:'#F7931A'},
   ]
   const pc=document.getElementById('pills')
   pillDefs.forEach(p=>{
     const el=document.createElement('div')
-    el.className='pill'+(p.modal?' clickable':'')
-    el.innerHTML=`<label>${p.label}</label><div class="pval" style="color:${p.color||'#fff'}">${p.val}</div>${p.trend?`<div class="trend" style="color:${p.up?'#1D9E75':'#E24B4A'}">${p.trend}</div>`:''}`
-    if(p.modal)el.onclick=()=>document.getElementById('modal-'+p.modal).classList.add('open')
+    el.style.cssText='background:#1e1e1e;border-radius:8px;padding:8px 12px;text-align:center;'
+    el.innerHTML=`<p style="font-size:10px;color:#666;margin:0;text-transform:uppercase;letter-spacing:0.5px;">${p.label}</p>
+      <p style="font-size:13px;font-weight:500;margin:2px 0 0;color:${p.color||'#fff'};">${p.val}</p>
+      ${p.trend?`<p style="font-size:10px;margin:1px 0 0;color:${p.up?'#1D9E75':'#E24B4A'};">${p.trend}</p>`:''}`
     pc.appendChild(el)
   })
 
@@ -168,32 +157,23 @@ fetch(GIST+'?t='+Date.now()).then(r=>r.json()).then(d=>{
   document.getElementById('total').textContent=fmt(to)
 
   // Panels
-  const pr=document.getElementById('panels-row')
-  pr.innerHTML=`
-    <div class="panel-sm" onclick="document.getElementById('modal-patrimonio').classList.add('open')">
-      <p class="plabel">Patrimonio</p>
-      <p class="pnum">USD ${patrimonioUSD.toLocaleString()}</p>
-      <p class="psub">Cuentas ${d.cuentas_usd.toLocaleString()} · Me deben ${meDebenUSD}</p>
-    </div>
-    <div class="panel-sm" onclick="document.getElementById('modal-fijos').classList.add('open')">
-      <p class="plabel">Gastos Fijos</p>
-      <p class="pnum">${fmt(fijosARS)}</p>
-      <p class="psub">por mes</p>
-    </div>
-    ${meDebenUSD>0?`<div class="panel-sm" onclick="document.getElementById('modal-deudas').classList.add('open')">
-      <p class="plabel">Deudas</p>
-      <p class="pnum" style="color:#1D9E75;">USD ${meDebenUSD}</p>
-      <p class="psub">${(d.me_deben||[]).map(m=>m.nombre).join(' · ')}</p>
-    </div>`:''}
-  `
+  const panelDefs=[
+    {id:'patrimonio', label:'Patrimonio', val:'USD '+patrimonioUSD.toLocaleString(), color:''},
+    {id:'fijos', label:'Gastos Fijos', val:fmt(fijosARS), color:''},
+    ...(meDebenUSD>0?[{id:'deudas', label:'Deudas', val:'USD '+meDebenUSD, color:'#1D9E75'}]:[])
+  ]
+  document.getElementById('panels').innerHTML=panelDefs.map(p=>`
+    <div class="panel-sm" onclick="document.getElementById('modal-${p.id}').classList.add('open')">
+      <p style="font-size:10px;color:#555;margin:0 0 4px;text-transform:uppercase;letter-spacing:0.6px;">${p.label}</p>
+      <p style="font-size:17px;font-weight:500;margin:0;color:${p.color||'#fff'};">${p.val}</p>
+    </div>`).join('')
 
   // Modal patrimonio
   const cuentas=d.cuentas_detalle||[{nombre:'CHASE',usd:589},{nombre:'Binance',usd:3000},{nombre:'Payoneer',usd:16},{nombre:'IEB',usd:4037}]
   document.getElementById('m-pat-rows').innerHTML=
     cuentas.map(c=>`<div class="modal-row"><span>${c.nombre}</span><span>USD ${c.usd.toLocaleString()}</span></div>`).join('')+
     `<div class="modal-total"><span>Total cuentas</span><span>USD ${d.cuentas_usd.toLocaleString()}</span></div>`+
-    (meDebenUSD>0?(d.me_deben||[]).map(m=>`<div class="modal-row" style="margin-top:4px;"><span>${m.nombre} me debe</span><span style="color:#1D9E75;">USD ${m.usd}</span></div>${m.detalle?`<div style="font-size:11px;color:#444;padding:2px 0 6px;padding-left:8px;">${m.detalle}</div>`:''}`).join('')+`<div class="modal-total"><span>Total patrimonio</span><span style="color:#1D9E75;">USD ${patrimonioUSD.toLocaleString()}</span></div>`:
-    `<div class="modal-total"><span>Total patrimonio</span><span style="color:#1D9E75;">USD ${patrimonioUSD.toLocaleString()}</span></div>`)
+    (meDebenUSD>0?(d.me_deben||[]).map(m=>`<div class="modal-row" style="margin-top:4px;"><span>${m.nombre} me debe</span><span style="color:#1D9E75;">USD ${m.usd}</span></div>${m.detalle?`<div style="font-size:11px;color:#444;padding:2px 0 6px 8px;">${m.detalle}</div>`:''}`).join('')+`<div class="modal-total"><span>Total patrimonio</span><span style="color:#1D9E75;">USD ${patrimonioUSD.toLocaleString()}</span></div>`:`<div class="modal-total"><span>Total patrimonio</span><span style="color:#1D9E75;">USD ${patrimonioUSD.toLocaleString()}</span></div>`)
 
   // Modal fijos
   document.getElementById('m-plat').textContent=fmtARS(54*mep)
@@ -209,12 +189,12 @@ fetch(GIST+'?t='+Date.now()).then(r=>r.json()).then(d=>{
 
   document.getElementById('updated').textContent='Actualizado '+d.fecha
 
-  // Chart — ingresos primero por mayor ing, gastos después por mayor gas
+  // Chart — ingresos primero, gastos después ordenados
   const cats=d.categorias||[]
-  const ingCats=cats.filter(c=>c.ing>0).sort((a,b)=>b.ing-a.ing)
-  const gasCats=cats.filter(c=>c.ing===0&&c.gas>0).sort((a,b)=>b.gas-a.gas)
-  const sorted=[...ingCats,...gasCats]
-  const chartH=Math.max(300, sorted.length*40+80)
+  const ingC=cats.filter(c=>c.ing>0).sort((a,b)=>b.ing-a.ing)
+  const gasC=cats.filter(c=>c.ing===0&&c.gas>0).sort((a,b)=>b.gas-a.gas)
+  const sorted=[...ingC,...gasC]
+  const chartH=Math.max(300, sorted.length*42+80)
   document.getElementById('chart').parentElement.style.height=chartH+'px'
 
   new Chart(document.getElementById('chart'),{
@@ -222,20 +202,22 @@ fetch(GIST+'?t='+Date.now()).then(r=>r.json()).then(d=>{
     data:{
       labels:sorted.map(c=>c.nombre),
       datasets:[
-        {label:'Ingresos',data:sorted.map(c=>c.ing),backgroundColor:'#1D9E75',borderRadius:4},
-        {label:'Gastos',data:sorted.map(c=>c.gas),backgroundColor:'#E24B4A',borderRadius:4}
+        {label:'Ingresos',data:sorted.map(c=>c.ing||0),backgroundColor:'#1D9E75',borderRadius:4},
+        {label:'Gastos',data:sorted.map(c=>c.gas||0),backgroundColor:'#E24B4A',borderRadius:4}
       ]
     },
     options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
       scales:{x:{ticks:{callback:fmt,color:'#666',font:{size:11}},grid:{color:'#1a1a1a'}},y:{ticks:{color:'#aaa',font:{size:11}},grid:{display:false}}}}
   })
 
-  // Movimientos — últimos 5
+  // Movimientos — últimos 5, columnas: Detalle | Categoría | Monto
   const movs=(d.movimientos||[]).slice(-5)
-  document.getElementById('movTable').innerHTML=movs.map((m,i)=>`
-    <tr><td style="color:#444;">${i+1}</td><td>${m.cat}</td><td style="color:#666;">${m.det||'—'}</td>
-    <td style="text-align:right;color:#1D9E75;">${m.ing>0?fmt(m.ing):'—'}</td>
-    <td style="text-align:right;color:#E24B4A;">${m.gas>0?fmt(m.gas):'—'}</td></tr>`).join('')
+  document.getElementById('movTable').innerHTML=movs.map(m=>`
+    <tr>
+      <td style="color:#888;">${m.det||'—'}</td>
+      <td>${m.cat}</td>
+      <td style="text-align:right;font-weight:500;color:${m.ing>0?'#1D9E75':'#E24B4A'};">${m.ing>0?'+'+fmt(m.ing):'-'+fmt(m.gas)}</td>
+    </tr>`).join('')
 })
 </script>
 </body>
