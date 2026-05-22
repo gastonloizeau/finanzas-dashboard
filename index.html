@@ -14,54 +14,45 @@
     th { text-align: left; color: #555; font-weight: 400; padding: 6px 8px; border-bottom: 1px solid #2a2a2a; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
     td { padding: 8px; border-bottom: 1px solid #1a1a1a; }
     tr:last-child td { border-bottom: none; }
-    .card-clickable { cursor: pointer; transition: background 0.15s; }
-    .card-clickable:hover { filter: brightness(1.2); }
+    .pill { background: #1e1e1e; border-radius: 8px; padding: 8px 12px; text-align: center; }
+    .pill label { font-size: 10px; color: #666; display: block; margin-bottom: 2px; letter-spacing: 0.5px; text-transform: uppercase; cursor: default; }
+    .pill .pval { font-size: 13px; font-weight: 500; }
+    .pill .trend { font-size: 10px; margin-top: 1px; }
+    .pill.clickable { cursor: pointer; transition: filter 0.15s; }
+    .pill.clickable:hover { filter: brightness(1.3); border: 0.5px solid #333; }
     .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100; align-items: center; justify-content: center; }
     .modal-overlay.open { display: flex; }
-    .modal { background: #1a1a1a; border-radius: 16px; padding: 24px; min-width: 300px; max-width: 440px; width: 90%; border: 0.5px solid #2a2a2a; }
+    .modal { background: #1a1a1a; border-radius: 16px; padding: 24px; min-width: 280px; max-width: 420px; width: 90%; border: 0.5px solid #2a2a2a; }
     .modal h3 { font-size: 15px; font-weight: 500; margin-bottom: 16px; color: #ccc; }
-    .modal-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 0.5px solid #222; font-size: 13px; }
+    .modal-row { display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 0.5px solid #222; font-size: 13px; }
     .modal-row:last-child { border-bottom: none; }
     .modal-row span:first-child { color: #666; }
-    .modal-total { display: flex; justify-content: space-between; padding: 12px 0 0; font-size: 15px; font-weight: 500; border-top: 0.5px solid #333; margin-top: 4px; }
+    .modal-total { display: flex; justify-content: space-between; padding: 10px 0 0; font-size: 14px; font-weight: 500; border-top: 0.5px solid #333; margin-top: 4px; }
     .close-btn { float: right; background: #2a2a2a; border: none; color: #888; border-radius: 6px; padding: 4px 10px; cursor: pointer; font-size: 12px; margin-bottom: 4px; }
+    .panel-sm { background: #1a1a1a; border-radius: 12px; padding: 1rem; border: 0.5px solid #2a2a2a; cursor: pointer; transition: filter 0.15s; }
+    .panel-sm:hover { filter: brightness(1.2); }
+    .panel-sm p.plabel { font-size: 10px; color: #555; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.6px; }
+    .panel-sm p.pnum { font-size: 17px; font-weight: 500; margin: 0; }
+    .panel-sm p.psub { font-size: 11px; color: #444; margin: 4px 0 0; }
     @media (max-width: 600px) {
-      body { padding: 14px; }
-      .eq-row { grid-template-columns: 1fr 1fr !important; gap: 8px !important; }
-      .eq-row > div { margin-right: 0 !important; }
+      body { padding: 12px; }
+      .pills-wrap { display: grid !important; grid-template-columns: repeat(3,1fr) !important; }
+      .eq-row { grid-template-columns: 1fr 1fr !important; }
       .eq-sign { display: none !important; }
-      .bottom-panels { grid-template-columns: 1fr !important; }
-      .market-pills { width: 100%; display: grid !important; grid-template-columns: 1fr 1fr 1fr; gap: 6px !important; }
-      .market-pills > div { padding: 8px 6px !important; }
-      .header-row { flex-direction: column; }
+      .panels-row { grid-template-columns: 1fr !important; }
       table { font-size: 11px; }
-      th, td { padding: 6px 4px !important; }
-      th { font-size: 9px !important; letter-spacing: 0.3px !important; }
-      .mov-num { display: none; }
+      th, td { padding: 5px 4px !important; }
     }
   </style>
 </head>
 <body>
 
-<div class="header-row" style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1.5rem; flex-wrap:wrap; gap:12px;">
+<div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1.5rem; flex-wrap:wrap; gap:12px;">
   <div>
     <p style="font-size:13px; color:#888; margin:0;">Mayo 2026</p>
     <p style="font-size:22px; font-weight:500; margin:4px 0 0;">Resumen del mes</p>
   </div>
-  <div class="market-pills" style="display:flex; gap:8px; flex-wrap:wrap;">
-    <div style="background:#1e1e1e; border-radius:8px; padding:8px 14px; text-align:center;">
-      <p style="font-size:10px; color:#666; margin:0; text-transform:uppercase; letter-spacing:0.5px;">Dólar MEP</p>
-      <p style="font-size:14px; font-weight:500; margin:2px 0 0;" id="mep">—</p>
-    </div>
-    <div style="background:#1e1e1e; border-radius:8px; padding:8px 14px; text-align:center;">
-      <p style="font-size:10px; color:#666; margin:0; text-transform:uppercase; letter-spacing:0.5px;">S&P 500</p>
-      <p style="font-size:14px; font-weight:500; margin:2px 0 0; color:#1D9E75;" id="sp500">—</p>
-    </div>
-    <div style="background:#1e1e1e; border-radius:8px; padding:8px 14px; text-align:center;">
-      <p style="font-size:10px; color:#666; margin:0; text-transform:uppercase; letter-spacing:0.5px;">Bitcoin</p>
-      <p style="font-size:14px; font-weight:500; margin:2px 0 0; color:#F7931A;" id="btc">—</p>
-    </div>
-  </div>
+  <div class="pills-wrap" style="display:flex; gap:8px; flex-wrap:wrap;" id="pills"></div>
 </div>
 
 <div class="eq-row" style="display:grid; grid-template-columns:1fr 1fr 1fr auto 1fr; gap:0; align-items:center; margin-bottom:1.5rem;">
@@ -85,214 +76,167 @@
 </div>
 
 <div style="background:#1a1a1a; border-radius:14px; padding:20px; margin-bottom:1.5rem; border:0.5px solid #2a2a2a;">
-  <div style="position:relative; height:320px;">
-    <canvas id="chart"></canvas>
-  </div>
+  <div style="position:relative; height:380px;"><canvas id="chart" role="img" aria-label="Categorías Mayo 2026"></canvas></div>
 </div>
 
-<div class="bottom-panels" style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:1.5rem;">
-
-  <div class="card-clickable" onclick="openModal('patrimonio')" style="background:#1a1a1a; border-radius:14px; padding:1.25rem; border:0.5px solid #2a2a2a;">
-    <p style="font-size:11px; color:#555; margin:0 0 4px; text-transform:uppercase; letter-spacing:0.6px;">Patrimonio</p>
-    <p style="font-size:22px; font-weight:500; margin:0 0 14px;" id="patrimonio">—</p>
-    <div style="display:flex; flex-direction:column; gap:8px;">
-      <div style="display:flex; justify-content:space-between;">
-        <span style="font-size:12px; color:#555;">Cuentas</span>
-        <span style="font-size:13px; font-weight:500;" id="pat-cuentas">—</span>
-      </div>
-      <div style="height:0.5px; background:#2a2a2a;"></div>
-      <div style="display:flex; justify-content:space-between;">
-        <span style="font-size:12px; color:#555;">Me deben</span>
-        <span style="font-size:13px; font-weight:500; color:#1D9E75;" id="pat-deben">—</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="card-clickable" onclick="openModal('fijos')" style="background:#1a1a1a; border-radius:14px; padding:1.25rem; border:0.5px solid #2a2a2a; display:flex; flex-direction:column; justify-content:center;">
-    <p style="font-size:11px; color:#555; margin:0 0 4px; text-transform:uppercase; letter-spacing:0.6px;">Gastos Fijos</p>
-    <p style="font-size:22px; font-weight:500; margin:0;" id="fijos">—</p>
-    <p style="font-size:11px; color:#444; margin:6px 0 0;">por mes</p>
-  </div>
-
-  <div class="card-clickable" onclick="openModal('deudas')" style="background:#1a1a1a; border-radius:14px; padding:1.25rem; border:0.5px solid #2a2a2a;">
-    <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:14px;">
-      <p style="font-size:11px; color:#555; margin:0; text-transform:uppercase; letter-spacing:0.6px;">Deudas</p>
-      <p style="font-size:15px; font-weight:500; margin:0; color:#1D9E75;" id="deudas-total">—</p>
-    </div>
-    <div id="deudas-rows" style="display:flex; flex-direction:column; gap:8px;"></div>
-  </div>
-
-</div>
+<div class="panels-row" style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:1.5rem;" id="panels-row"></div>
 
 <div style="background:#1a1a1a; border-radius:14px; padding:1.25rem; border:0.5px solid #2a2a2a;">
   <p style="font-size:13px; font-weight:500; margin:0 0 12px; color:#ccc;">Últimos movimientos</p>
-  <table>
-    <thead>
-      <tr>
-        <th class="mov-num">#</th><th>Categoría</th><th>Detalle</th>
-        <th style="text-align:right; color:#1D9E75;">Ingreso</th>
-        <th style="text-align:right; color:#E24B4A;">Gasto</th>
-      </tr>
-    </thead>
-    <tbody id="movTable"></tbody>
-  </table>
+  <table><thead><tr>
+    <th>#</th><th>Categoría</th><th>Detalle</th>
+    <th style="text-align:right; color:#1D9E75;">Ingreso</th>
+    <th style="text-align:right; color:#E24B4A;">Gasto</th>
+  </tr></thead><tbody id="movTable"></tbody></table>
 </div>
 
 <div class="updated" id="updated">—</div>
 
-<!-- Modal Patrimonio -->
-<div class="modal-overlay" id="modal-patrimonio" onclick="closeOnBg(event,'patrimonio')">
-  <div class="modal">
-    <button class="close-btn" onclick="closeModal('patrimonio')">✕ cerrar</button>
-    <h3>Patrimonio</h3>
-    <div class="modal-row"><span>CHASE</span><span>USD 89</span></div>
-    <div class="modal-row"><span>Binance</span><span>USD 3.000</span></div>
-    <div class="modal-row"><span>Payoneer</span><span>USD 16</span></div>
-    <div class="modal-row"><span>IEB</span><span>USD 3.437</span></div>
-    <div class="modal-row" style="font-weight:500;"><span style="color:#fff;">Total cuentas</span><span id="m-cuentas">—</span></div>
-    <div class="modal-row"><span>Me deben</span><span id="m-medeben" style="color:#1D9E75;">—</span></div>
-    <div class="modal-total"><span>Total patrimonio</span><span id="m-patrimonio" style="color:#1D9E75;">—</span></div>
+<!-- Modales -->
+<div class="modal-overlay" id="modal-patrimonio" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal"><button class="close-btn" onclick="document.getElementById('modal-patrimonio').classList.remove('open')">✕ cerrar</button>
+    <h3>Patrimonio</h3><div id="m-pat-rows"></div>
   </div>
 </div>
-
-<!-- Modal Gastos Fijos -->
-<div class="modal-overlay" id="modal-fijos" onclick="closeOnBg(event,'fijos')">
-  <div class="modal">
-    <button class="close-btn" onclick="closeModal('fijos')">✕ cerrar</button>
+<div class="modal-overlay" id="modal-fijos" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal"><button class="close-btn" onclick="document.getElementById('modal-fijos').classList.remove('open')">✕ cerrar</button>
     <h3>Gastos Fijos</h3>
     <div class="modal-row"><span>Seguro</span><span>$50.400</span></div>
     <div class="modal-row"><span>Monotributo</span><span>$64.000</span></div>
     <div class="modal-row"><span>Obra Social</span><span>$92.768</span></div>
     <div class="modal-row"><span>Expensas</span><span>$60.000</span></div>
-    <div class="modal-row" style="font-weight:500;"><span style="color:#fff;">Plataformas</span><span id="m-plat-total">—</span></div>
-    <div class="modal-row" style="padding-left:12px;"><span style="color:#444;">SUNO</span><span>$10 USD</span></div>
-    <div class="modal-row" style="padding-left:12px;"><span style="color:#444;">Instagram</span><span>$7 USD</span></div>
-    <div class="modal-row" style="padding-left:12px;"><span style="color:#444;">Google Drive</span><span>$10 USD</span></div>
-    <div class="modal-row" style="padding-left:12px;"><span style="color:#444;">Claude</span><span>$20 USD</span></div>
-    <div class="modal-row" style="padding-left:12px;"><span style="color:#444;">iCloud</span><span>$3 USD</span></div>
-    <div class="modal-row" style="padding-left:12px;"><span style="color:#444;">Spotify</span><span>$4 USD</span></div>
+    <div class="modal-row"><span>Plataformas (54 USD)</span><span id="m-plat">—</span></div>
+    <div style="padding-left:12px; border-left:2px solid #222; margin:4px 0;">
+      <div class="modal-row"><span style="color:#444;">SUNO</span><span>$10 USD</span></div>
+      <div class="modal-row"><span style="color:#444;">Instagram</span><span>$7 USD</span></div>
+      <div class="modal-row"><span style="color:#444;">Google Drive</span><span>$10 USD</span></div>
+      <div class="modal-row"><span style="color:#444;">Claude</span><span>$20 USD</span></div>
+      <div class="modal-row"><span style="color:#444;">iCloud</span><span>$3 USD</span></div>
+      <div class="modal-row"><span style="color:#444;">Spotify</span><span>$4 USD</span></div>
+    </div>
     <div class="modal-total"><span>Total mensual</span><span id="m-fijos-total" style="color:#E24B4A;">—</span></div>
   </div>
 </div>
-
-<!-- Modal Deudas -->
-<div class="modal-overlay" id="modal-deudas" onclick="closeOnBg(event,'deudas')">
-  <div class="modal">
-    <button class="close-btn" onclick="closeModal('deudas')">✕ cerrar</button>
-    <h3>Deudas</h3>
-    <div id="modal-deudas-rows"></div>
+<div class="modal-overlay" id="modal-deudas" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal"><button class="close-btn" onclick="document.getElementById('modal-deudas').classList.remove('open')">✕ cerrar</button>
+    <h3>Deudas</h3><div id="m-deudas-rows"></div>
     <div class="modal-total"><span>Total</span><span id="m-deudas-total" style="color:#1D9E75;">—</span></div>
   </div>
 </div>
 
 <script>
-const GIST = "https://gist.githubusercontent.com/gastonloizeau/038451cb02ce1b4a2c492f112e352ef6/raw/finanzas.json"
-const fmt = (v) => {
-  if (!v && v !== 0) return '$0'
-  const abs = Math.abs(v)
-  const sign = v < 0 ? '-' : ''
-  if (abs >= 1000000) return sign + '$' + (abs/1000000).toFixed(1) + 'M'
-  if (abs >= 1000) return sign + '$' + Math.round(abs/1000) + 'k'
-  return sign + '$' + abs
-}
-const fmtARS = (n) => '$' + Math.round(n).toLocaleString('es-AR')
+const GIST="https://gist.githubusercontent.com/gastonloizeau/038451cb02ce1b4a2c492f112e352ef6/raw/finanzas.json"
+const fmt=v=>{if(!v&&v!==0)return'$0';const a=Math.abs(v),s=v<0?'-':'';return s+'$'+(a>=1e6?(a/1e6).toFixed(1)+'M':a>=1000?Math.round(a/1000)+'k':a);}
+const fmtARS=n=>'$'+Math.round(n).toLocaleString('es-AR')
 
-fetch(GIST + '?t=' + Date.now())
-  .then(r => r.json())
-  .then(d => {
-    const mep = d.dolar_mep || 1430.80
-    document.getElementById('mep').textContent = '$' + mep.toLocaleString('es-AR')
-    document.getElementById('sp500').textContent = '$' + (d.sp500 || '7.379')
-    document.getElementById('btc').textContent = '$' + (d.btc || '76.794')
-    document.getElementById('ingresos').textContent = fmt(d.ingresos)
-    document.getElementById('gastos').textContent = fmt(d.gastos)
+fetch(GIST+'?t='+Date.now()).then(r=>r.json()).then(d=>{
+  const mep=d.dolar_mep||1427.4
+  const meDebenUSD=(d.me_deben||[]).reduce((a,b)=>a+b.usd,0)
+  const patrimonioUSD=d.cuentas_usd+meDebenUSD
+  const fijosARS=50400+64000+92768+60000+Math.round(54*mep)
 
-    const musica = d.musica || 0
-    const mc = document.getElementById('musica-card')
-    const ml = document.getElementById('musica-label')
-    const mv = document.getElementById('musica')
-    mc.style.background = musica >= 0 ? '#0e2018' : '#2a1515'
-    ml.style.color = musica >= 0 ? '#1D9E75' : '#E24B4A'
-    mv.style.color = musica >= 0 ? '#1D9E75' : '#E24B4A'
-    mv.textContent = fmt(musica)
-
-    const total = d.total_mes || 0
-    const tc = document.getElementById('total-card')
-    const tl = document.getElementById('total-label')
-    const tv = document.getElementById('total')
-    tc.style.background = total >= 0 ? '#0e2018' : '#2a1515'
-    tl.style.color = total >= 0 ? '#1D9E75' : '#E24B4A'
-    tv.style.color = total >= 0 ? '#1D9E75' : '#E24B4A'
-    tv.textContent = fmt(total)
-
-    const meDebenUSD = d.me_deben.reduce((a,b) => a + b.usd, 0)
-    const patrimonioUSD = d.cuentas_usd + meDebenUSD
-    document.getElementById('patrimonio').textContent = 'USD ' + patrimonioUSD.toLocaleString()
-    document.getElementById('pat-cuentas').textContent = 'USD ' + d.cuentas_usd.toLocaleString()
-    document.getElementById('pat-deben').textContent = 'USD ' + meDebenUSD.toLocaleString()
-
-    const fijosARS = 50400 + 64000 + 92768 + 60000 + Math.round(54 * mep)
-    document.getElementById('fijos').textContent = fmt(fijosARS)
-
-    document.getElementById('deudas-total').textContent = 'USD ' + meDebenUSD
-    document.getElementById('deudas-rows').innerHTML = d.me_deben.map((m, i, arr) => `
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <span style="font-size:12px; color:#555;">${m.nombre} me debe</span>
-        <span style="font-size:13px; font-weight:500; color:#1D9E75;">USD ${m.usd}</span>
-      </div>
-      ${i < arr.length - 1 ? '<div style="height:0.5px; background:#2a2a2a; margin:8px 0;"></div>' : ''}
-    `).join('')
-
-    document.getElementById('updated').textContent = 'Actualizado ' + d.fecha
-
-    // Modales
-    document.getElementById('m-cuentas').textContent = 'USD ' + d.cuentas_usd.toLocaleString()
-    document.getElementById('m-medeben').textContent = 'USD ' + meDebenUSD
-    document.getElementById('m-patrimonio').textContent = 'USD ' + patrimonioUSD.toLocaleString()
-    document.getElementById('m-plat-total').textContent = fmtARS(54 * mep)
-    document.getElementById('m-fijos-total').textContent = fmtARS(fijosARS)
-    document.getElementById('modal-deudas-rows').innerHTML = d.me_deben.map((m, i, arr) => `
-      <div class="modal-row">
-        <span>${m.nombre} me debe</span>
-        <span style="color:#1D9E75;">USD ${m.usd}</span>
-      </div>
-    `).join('')
-    document.getElementById('m-deudas-total').textContent = 'USD ' + meDebenUSD
-
-    new Chart(document.getElementById('chart'), {
-      type: 'bar',
-      data: {
-        labels: d.categorias.map(c => c.nombre),
-        datasets: [
-          { label: 'Ingresos', data: d.categorias.map(c => c.ing), backgroundColor: '#1D9E75', borderRadius: 4 },
-          { label: 'Gastos', data: d.categorias.map(c => c.gas), backgroundColor: '#E24B4A', borderRadius: 4 }
-        ]
-      },
-      options: {
-        indexAxis: 'y', responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          x: { ticks: { callback: fmt, color: '#666', font: { size: 11 } }, grid: { color: '#1a1a1a' } },
-          y: { ticks: { color: '#aaa', font: { size: 11 } }, grid: { display: false } }
-        }
-      }
-    })
-
-    const movs = d.movimientos || []
-    document.getElementById('movTable').innerHTML = movs.map((m,i) => `
-      <tr>
-        <td class="mov-num" style="color:#444;">${i+1}</td>
-        <td>${m.cat}</td>
-        <td style="color:#666;">${m.det || '—'}</td>
-        <td style="text-align:right; color:#1D9E75;">${m.ing > 0 ? fmt(m.ing) : '—'}</td>
-        <td style="text-align:right; color:#E24B4A;">${m.gas > 0 ? fmt(m.gas) : '—'}</td>
-      </tr>
-    `).join('')
+  // Pills
+  const pillDefs=[
+    {label:'Dólar MEP',val:'$'+mep.toLocaleString('es-AR'),color:''},
+    {label:'S&P 500',val:'$'+(d.sp500||'7.492'),trend:d.sp500_trend||'',up:d.sp500_up!==false,color:'#1D9E75'},
+    {label:'Bitcoin',val:'$'+(d.btc||'76.793'),trend:d.btc_trend||'',up:d.btc_up!==false,color:'#F7931A'},
+    {label:'Patrimonio',val:'USD '+patrimonioUSD.toLocaleString(),color:'',modal:'patrimonio'},
+    {label:'Gastos Fijos',val:fmt(fijosARS),color:'',modal:'fijos'},
+    ...(meDebenUSD>0?[{label:'Deudas',val:'USD '+meDebenUSD,color:'#1D9E75',modal:'deudas'}]:[])
+  ]
+  const pc=document.getElementById('pills')
+  pillDefs.forEach(p=>{
+    const el=document.createElement('div')
+    el.className='pill'+(p.modal?' clickable':'')
+    el.innerHTML=`<label>${p.label}</label><div class="pval" style="color:${p.color||'#fff'}">${p.val}</div>${p.trend?`<div class="trend" style="color:${p.up?'#1D9E75':'#E24B4A'}">${p.trend}</div>`:''}`
+    if(p.modal)el.onclick=()=>document.getElementById('modal-'+p.modal).classList.add('open')
+    pc.appendChild(el)
   })
 
-function openModal(id) { document.getElementById('modal-' + id).classList.add('open') }
-function closeModal(id) { document.getElementById('modal-' + id).classList.remove('open') }
-function closeOnBg(e, id) { if (e.target === document.getElementById('modal-' + id)) closeModal(id) }
+  // Top cards
+  document.getElementById('ingresos').textContent=fmt(d.ingresos)
+  document.getElementById('gastos').textContent=fmt(d.gastos)
+  const mu=d.musica||0
+  document.getElementById('musica-card').style.background=mu>=0?'#0e2018':'#2a1515'
+  document.getElementById('musica-label').style.color=mu>=0?'#1D9E75':'#E24B4A'
+  document.getElementById('musica').style.color=mu>=0?'#1D9E75':'#E24B4A'
+  document.getElementById('musica').textContent=fmt(mu)
+  const to=d.total_mes||0
+  document.getElementById('total-card').style.background=to>=0?'#0e2018':'#2a1515'
+  document.getElementById('total-label').style.color=to>=0?'#1D9E75':'#E24B4A'
+  document.getElementById('total').style.color=to>=0?'#1D9E75':'#E24B4A'
+  document.getElementById('total').textContent=fmt(to)
+
+  // Panels
+  const pr=document.getElementById('panels-row')
+  pr.innerHTML=`
+    <div class="panel-sm" onclick="document.getElementById('modal-patrimonio').classList.add('open')">
+      <p class="plabel">Patrimonio</p>
+      <p class="pnum">USD ${patrimonioUSD.toLocaleString()}</p>
+      <p class="psub">Cuentas ${d.cuentas_usd.toLocaleString()} · Me deben ${meDebenUSD}</p>
+    </div>
+    <div class="panel-sm" onclick="document.getElementById('modal-fijos').classList.add('open')">
+      <p class="plabel">Gastos Fijos</p>
+      <p class="pnum">${fmt(fijosARS)}</p>
+      <p class="psub">por mes</p>
+    </div>
+    ${meDebenUSD>0?`<div class="panel-sm" onclick="document.getElementById('modal-deudas').classList.add('open')">
+      <p class="plabel">Deudas</p>
+      <p class="pnum" style="color:#1D9E75;">USD ${meDebenUSD}</p>
+      <p class="psub">${(d.me_deben||[]).map(m=>m.nombre).join(' · ')}</p>
+    </div>`:''}
+  `
+
+  // Modal patrimonio
+  const cuentas=d.cuentas_detalle||[{nombre:'CHASE',usd:589},{nombre:'Binance',usd:3000},{nombre:'Payoneer',usd:16},{nombre:'IEB',usd:4037}]
+  document.getElementById('m-pat-rows').innerHTML=
+    cuentas.map(c=>`<div class="modal-row"><span>${c.nombre}</span><span>USD ${c.usd.toLocaleString()}</span></div>`).join('')+
+    `<div class="modal-total"><span>Total cuentas</span><span>USD ${d.cuentas_usd.toLocaleString()}</span></div>`+
+    (meDebenUSD>0?(d.me_deben||[]).map(m=>`<div class="modal-row" style="margin-top:4px;"><span>${m.nombre} me debe</span><span style="color:#1D9E75;">USD ${m.usd}</span></div>${m.detalle?`<div style="font-size:11px;color:#444;padding:2px 0 6px;padding-left:8px;">${m.detalle}</div>`:''}`).join('')+`<div class="modal-total"><span>Total patrimonio</span><span style="color:#1D9E75;">USD ${patrimonioUSD.toLocaleString()}</span></div>`:
+    `<div class="modal-total"><span>Total patrimonio</span><span style="color:#1D9E75;">USD ${patrimonioUSD.toLocaleString()}</span></div>`)
+
+  // Modal fijos
+  document.getElementById('m-plat').textContent=fmtARS(54*mep)
+  document.getElementById('m-fijos-total').textContent=fmtARS(fijosARS)
+
+  // Modal deudas
+  if(meDebenUSD>0){
+    document.getElementById('m-deudas-rows').innerHTML=(d.me_deben||[]).map(m=>
+      `<div class="modal-row"><span>${m.nombre} me debe</span><span style="color:#1D9E75;">USD ${m.usd}</span></div>`+
+      (m.detalle?`<div style="font-size:11px;color:#444;padding:2px 0 6px;">${m.detalle}</div>`:'')).join('')
+    document.getElementById('m-deudas-total').textContent='USD '+meDebenUSD
+  }
+
+  document.getElementById('updated').textContent='Actualizado '+d.fecha
+
+  // Chart — ingresos primero por mayor ing, gastos después por mayor gas
+  const cats=d.categorias||[]
+  const ingCats=cats.filter(c=>c.ing>0).sort((a,b)=>b.ing-a.ing)
+  const gasCats=cats.filter(c=>c.ing===0&&c.gas>0).sort((a,b)=>b.gas-a.gas)
+  const sorted=[...ingCats,...gasCats]
+  const chartH=Math.max(300, sorted.length*40+80)
+  document.getElementById('chart').parentElement.style.height=chartH+'px'
+
+  new Chart(document.getElementById('chart'),{
+    type:'bar',
+    data:{
+      labels:sorted.map(c=>c.nombre),
+      datasets:[
+        {label:'Ingresos',data:sorted.map(c=>c.ing),backgroundColor:'#1D9E75',borderRadius:4},
+        {label:'Gastos',data:sorted.map(c=>c.gas),backgroundColor:'#E24B4A',borderRadius:4}
+      ]
+    },
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{x:{ticks:{callback:fmt,color:'#666',font:{size:11}},grid:{color:'#1a1a1a'}},y:{ticks:{color:'#aaa',font:{size:11}},grid:{display:false}}}}
+  })
+
+  // Movimientos — últimos 5
+  const movs=(d.movimientos||[]).slice(-5)
+  document.getElementById('movTable').innerHTML=movs.map((m,i)=>`
+    <tr><td style="color:#444;">${i+1}</td><td>${m.cat}</td><td style="color:#666;">${m.det||'—'}</td>
+    <td style="text-align:right;color:#1D9E75;">${m.ing>0?fmt(m.ing):'—'}</td>
+    <td style="text-align:right;color:#E24B4A;">${m.gas>0?fmt(m.gas):'—'}</td></tr>`).join('')
+})
 </script>
 </body>
 </html>
